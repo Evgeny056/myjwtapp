@@ -36,7 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractTokenFromRequest(HttpServletRequest request) {
-        // Логика извлечения токена из запроса (например, из заголовка Authorization)
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
@@ -46,9 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
     private Authentication createAuthentication(String token) {
-        // Логика создания объекта Authentication на основе токена
         UserDetails userDetails = jwtUtil.extractUserDetailsFromToken(token);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
-
 }
