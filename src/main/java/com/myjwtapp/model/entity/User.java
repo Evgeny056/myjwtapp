@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 
 
 @Entity
@@ -30,15 +31,18 @@ public class User  implements UserDetails {
     private String username;
     private String password;
     private String role;
+    private int failedAttempt;
+    private boolean accountLocked;
+    private Date lockTime;
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !accountLocked;
     }
 
     @Override
