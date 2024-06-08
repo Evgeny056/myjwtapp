@@ -1,11 +1,17 @@
 server:
-  port: 8080
+  port: 8443
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-password: cerfappkey
+    key-store-type: PKCS12
+    key-alias: cerfapp
 
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/myjwtapp
     username: postgres
     password: postgres
+
   jpa:
     properties:
       hibernate:

@@ -43,7 +43,8 @@ public class SecurityConfiguration {
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrfCustomizer -> csrfCustomizer.disable())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .requiresChannel(requiresChannel -> requiresChannel.anyRequest().requiresSecure());
 
         return http.build();
     }
