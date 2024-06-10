@@ -1,9 +1,13 @@
 package com.myjwtapp.service;
 
+import com.myjwtapp.exception.InvalidTokenException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -49,8 +53,12 @@ public class JwtUtil {
 
             return true;
 
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
+        } catch (SignatureException e) {
+            throw new InvalidTokenException("JWT does not match expected signature");
+        } catch (UnsupportedJwtException e) {
+            throw new InvalidTokenException("JWT is using an unsupported type or format");
+        } catch (MalformedJwtException e) {
+            throw new InvalidTokenException("JWT is not well formed");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.myjwtapp.filter;
 
+import com.myjwtapp.exception.InvalidTokenException;
 import com.myjwtapp.service.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,7 +15,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.myjwtapp.service.JwtUtil.validateToken;
 
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -26,13 +26,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = extractTokenFromRequest(request);
+        try {
+                if (token != null && JwtUtil.validateToken(token)) {
+                    Authentication authentication = createAuthentication(token);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
 
-        if (token != null && validateToken(token)) {
-            Authentication authentication = createAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (InvalidTokenException e) {
+            logger.warn(e.getMessage());
+        } finally {
+            filterChain.doFilter(request, response);
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private String extractTokenFromRequest(HttpServletRequest request) {

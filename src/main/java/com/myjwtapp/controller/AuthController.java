@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,11 +32,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        User user = userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
-
-        if (user == null) {
-            return ResponseEntity.status(401).body("Invalid username or password");
-        }
+        User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(()->
+                new UsernameNotFoundException("Didn't find user using login"));
 
         if (userLoginAttemptService.isAccountLocked(user)) {
             return ResponseEntity.status(423).body("Account locked due to too many failed attempts");
@@ -53,7 +51,7 @@ public class AuthController {
             return ResponseEntity.ok(new JwtResponse(token));
         } catch (AuthenticationException e) {
             userLoginAttemptService.increaseFailedAttempts(user);
-            return ResponseEntity.status(401).body("Invalid username or password");
+            return ResponseEntity.status(401).body("Invalid password");
         }
     }
 }
